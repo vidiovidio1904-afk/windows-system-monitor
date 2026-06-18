@@ -1,2 +1,4 @@
 psutil
-GPUtil
+gputil
+py-cpuinfo
+pyinstaller
