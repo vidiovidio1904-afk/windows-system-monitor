@@ -1,20 +1,12 @@
-import psutil
+def show_processes(self):
 
-def get_top_processes(limit=20):
+    text = ""
 
-    processes = []
-
-    for proc in psutil.process_iter(
-        ['pid', 'name', 'memory_percent']
-    ):
+    for proc in psutil.process_iter(['pid', 'name']):
 
         try:
-            processes.append(proc.info)
+            text += f"{proc.info['pid']} | {proc.info['name']}\n"
         except:
             pass
 
-    return sorted(
-        processes,
-        key=lambda x: x['memory_percent'],
-        reverse=True
-    )[:limit]
+    self.set_content(text)
