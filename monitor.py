@@ -1,188 +1,235 @@
 import tkinter as tk
-from tkinter import messagebox, filedialog
-import psutil
-import GPUtil
-import datetime
+from tkinter import ttk
 import platform
 import socket
+import psutil
 
 
 class SystemMonitor:
-
     def __init__(self, root):
         self.root = root
+        self.root.title("Windows System Monitor Pro v2.0")
+        self.root.geometry("1000x600")
 
-        self.root.title("Windows System Monitor v1.1")
-        self.root.geometry("500x420")
-        self.root.resizable(False, False)
+        self.create_ui()
+        self.update_info()
 
-        title = tk.Label(
-            root,
-            text="Windows System Monitor v1.1",
-            font=("Arial", 16, "bold")
+    def create_ui(self):
+
+        self.left_frame = tk.Frame(self.root, width=250, bg="#f0f0f0")
+        self.left_frame.pack(side="left", fill="y")
+
+        self.right_frame = tk.Frame(self.root)
+        self.right_frame.pack(side="right", fill="both", expand=True)
+
+        self.tree = ttk.Treeview(self.left_frame)
+        self.tree.pack(fill="both", expand=True)
+
+        self.tree.insert("", "end", "summary", text="📊 Сводка")
+        self.tree.insert("", "end", "cpu", text="🖥 Процессор")
+        self.tree.insert("", "end", "ram", text="💾 Память")
+        self.tree.insert("", "end", "gpu", text="🎮 Видеокарта")
+        self.tree.insert("", "end", "disk", text="📁 Накопители")
+        self.tree.insert("", "end", "network", text="🌐 Сеть")
+        self.tree.insert("", "end", "processes", text="⚙ Процессы")
+
+        self.tree.bind("<<TreeviewSelect>>", self.on_select)
+
+        self.title_label = tk.Label(
+            self.right_frame,
+            text="Сводка системы",
+            font=("Segoe UI", 18, "bold")
         )
-        title.pack(pady=10)
+        self.title_label.pack(pady=10)
 
-        self.info = tk.Label(
-            root,
-            text="Loading...",
-            justify="left",
+        self.info_text = tk.Text(
+            self.right_frame,
             font=("Consolas", 11)
         )
+        self.info_text.pack(fill="both", expand=True, padx=10, pady=10)
 
-        self.info.pack(pady=10)
+    def on_select(self, event):
 
-        button_frame = tk.Frame(root)
-        button_frame.pack(pady=10)
+        selected = self.tree.selection()[0]
 
-        tk.Button(
-            button_frame,
-            text="Refresh",
-            width=15,
-            command=self.update_stats
-        ).grid(row=0, column=0, padx=5)
+        if selected == "summary":
+            self.show_summary()
 
-        tk.Button(
-            button_frame,
-            text="Export Report",
-            width=15,
-            command=self.export_report
-        ).grid(row=0, column=1, padx=5)
+        elif selected == "cpu":
+            self.show_cpu()
 
-        self.update_stats()
+        elif selected == "ram":
+            self.show_ram()
 
-    def get_uptime(self):
-        boot = datetime.datetime.fromtimestamp(psutil.boot_time())
-        now = datetime.datetime.now()
+        elif selected == "disk":
+            self.show_disk()
 
-        uptime = now - boot
+        elif selected == "network":
+            self.show_network()
 
-        days = uptime.days
-        hours = uptime.seconds // 3600
-        minutes = (uptime.seconds % 3600) // 60
+        elif selected == "processes":
+            self.show_processes()
 
-        return f"{days}d {hours}h {minutes}m"
+        elif selected == "gpu":
+            self.show_gpu()
 
-    def get_gpu_info(self):
-        try:
-            gpus = GPUtil.getGPUs()
+    def clear_text(self):
+        self.info_text.delete("1.0", tk.END)
 
-            if not gpus:
-                return "Not Found", "N/A", "N/A"
+    def show_summary(self):
 
-            gpu = gpus[0]
+        self.title_label.config(text="Сводка системы")
 
-            usage = f"{gpu.load * 100:.0f}%"
-            temp = f"{gpu.temperature}°C"
-
-            return gpu.name, usage, temp
-
-        except Exception:
-            return "Error", "N/A", "N/A"
-
-    def get_cpu_temp(self):
-        try:
-            temps = psutil.sensors_temperatures()
-
-            if not temps:
-                return "N/A"
-
-            for name in temps:
-                if temps[name]:
-                    return f"{temps[name][0].current}°C"
-
-            return "N/A"
-
-        except Exception:
-            return "N/A"
-
-    def update_stats(self):
-
-        cpu = psutil.cpu_percent()
-
-        ram = psutil.virtual_memory()
-
-        disk = psutil.disk_usage("/")
-
-        hostname = socket.gethostname()
-
-        os_name = platform.system() + " " + platform.release()
-
-        cpu_temp = self.get_cpu_temp()
-
-        gpu_name, gpu_usage, gpu_temp = self.get_gpu_info()
+        self.clear_text()
 
         text = f"""
-🖥 Computer: {hostname}
+Компьютер: {socket.gethostname()}
 
-💻 OS: {os_name}
+ОС: {platform.system()} {platform.release()}
 
-⚙ CPU Usage: {cpu}%
-🌡 CPU Temp: {cpu_temp}
+Процессор:
+{platform.processor()}
 
-🧠 RAM Usage: {ram.percent}%
+CPU:
+{psutil.cpu_percent()} %
 
-📀 Disk Usage: {disk.percent}%
+RAM:
+{psutil.virtual_memory().percent} %
 
-🎮 GPU: {gpu_name}
-📈 GPU Usage: {gpu_usage}
-🌡 GPU Temp: {gpu_temp}
-
-⏱ Uptime: {self.get_uptime()}
+Время работы:
+{round(psutil.boot_time())}
 """
 
-        self.info.config(text=text)
+        self.info_text.insert(tk.END, text)
 
-        self.root.after(2000, self.update_stats)
+    def show_cpu(self):
 
-    def export_report(self):
+        self.title_label.config(text="Процессор")
 
-        cpu = psutil.cpu_percent()
+        self.clear_text()
 
-        ram = psutil.virtual_memory()
+        text = f"""
+Ядер: {psutil.cpu_count(logical=False)}
 
-        disk = psutil.disk_usage("/")
+Потоков: {psutil.cpu_count()}
 
-        gpu_name, gpu_usage, gpu_temp = self.get_gpu_info()
-
-        report = f"""
-Windows System Monitor Report
-
-Date: {datetime.datetime.now()}
-
-CPU Usage: {cpu}%
-CPU Temp: {self.get_cpu_temp()}
-
-RAM Usage: {ram.percent}%
-
-Disk Usage: {disk.percent}%
-
-GPU: {gpu_name}
-GPU Usage: {gpu_usage}
-GPU Temp: {gpu_temp}
-
-Uptime: {self.get_uptime()}
+Загрузка:
+{psutil.cpu_percent()} %
 """
 
-        file = filedialog.asksaveasfilename(
-            defaultextension=".txt",
-            filetypes=[("Text File", "*.txt")]
+        self.info_text.insert(tk.END, text)
+
+    def show_ram(self):
+
+        mem = psutil.virtual_memory()
+
+        self.title_label.config(text="Оперативная память")
+
+        self.clear_text()
+
+        text = f"""
+Всего:
+{round(mem.total / 1024**3,2)} GB
+
+Используется:
+{round(mem.used / 1024**3,2)} GB
+
+Свободно:
+{round(mem.available / 1024**3,2)} GB
+
+Загрузка:
+{mem.percent} %
+"""
+
+        self.info_text.insert(tk.END, text)
+
+    def show_disk(self):
+
+        self.title_label.config(text="Накопители")
+
+        self.clear_text()
+
+        text = ""
+
+        for p in psutil.disk_partitions():
+
+            try:
+                usage = psutil.disk_usage(p.mountpoint)
+
+                text += f"""
+Диск: {p.device}
+
+Всего:
+{round(usage.total / 1024**3,2)} GB
+
+Использовано:
+{usage.percent} %
+
+-----------------------
+"""
+
+            except:
+                pass
+
+        self.info_text.insert(tk.END, text)
+
+    def show_network(self):
+
+        net = psutil.net_io_counters()
+
+        self.title_label.config(text="Сеть")
+
+        self.clear_text()
+
+        text = f"""
+Отправлено:
+{round(net.bytes_sent / 1024**2,2)} MB
+
+Получено:
+{round(net.bytes_recv / 1024**2,2)} MB
+"""
+
+        self.info_text.insert(tk.END, text)
+
+    def show_processes(self):
+
+        self.title_label.config(text="Процессы")
+
+        self.clear_text()
+
+        text = ""
+
+        for proc in psutil.process_iter(['pid', 'name']):
+
+            try:
+                text += f"{proc.info['pid']} | {proc.info['name']}\n"
+
+            except:
+                pass
+
+        self.info_text.insert(tk.END, text)
+
+    def show_gpu(self):
+
+        self.title_label.config(text="Видеокарта")
+
+        self.clear_text()
+
+        self.info_text.insert(
+            tk.END,
+            "GPU раздел будет добавлен на следующем этапе"
         )
 
-        if file:
-            with open(file, "w", encoding="utf-8") as f:
-                f.write(report)
+    def update_info(self):
 
-            messagebox.showinfo(
-                "Success",
-                "Report exported successfully"
-            )
+        selected = self.tree.selection()
+
+        if selected:
+            self.on_select(None)
+
+        self.root.after(2000, self.update_info)
 
 
-if __name__ == "__main__":
-
-    root = tk.Tk()
-
-    app = SystemMonitor(root)
-
-    root.mainloop()
+root = tk.Tk()
+app = SystemMonitor(root)
+root.mainloop()
