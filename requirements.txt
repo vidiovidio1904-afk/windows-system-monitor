@@ -1,4 +1,7 @@
+customtkinter
 psutil
-gputil
+wmi
+pywin32
+GPUtil
 py-cpuinfo
-pyinstaller
+matplotlib
