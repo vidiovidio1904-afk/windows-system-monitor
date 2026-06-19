@@ -1,28 +1,48 @@
-# Windows System Monitor
+# Windows System Monitor Pro
 
-Desktop utility for monitoring Windows system resources.
+Modern Windows monitoring utility written in Python.
 
 ## Features
 
-- CPU Usage
-- RAM Usage
-- Disk Usage
-- GPU Usage
-- GPU Temperature
-- System Uptime
-
-## Screenshot
-
-(сюда скриншот программы)
-
-## Installation
-
-Download WindowsSystemMonitor.exe from Releases and run.
+* Real-time CPU monitoring
+* RAM monitoring
+* GPU monitoring
+* CPU/GPU temperatures
+* Disk usage information
+* Network statistics
+* Running processes viewer
+* Top processes by memory usage
+* Motherboard information
+* HTML report export
+* Windows 11 inspired UI
 
 ## Technologies
 
-- Python
-- Tkinter
-- psutil
-- GPUtil
-- PyInstaller
+* Python
+* CustomTkinter
+* Psutil
+* GPUtil
+* WMI
+* Matplotlib
+
+## Build
+
+```bash
+pip install -r requirements.txt
+python main.py
+```
+
+Create EXE:
+
+```bash
+build\build_exe.bat
+```
+
+## Screenshot
+
+(Add screenshots here)
+
+## Author
+
+Alex
+
