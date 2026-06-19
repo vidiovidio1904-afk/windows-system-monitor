@@ -332,7 +332,7 @@ class SystemMonitor:
                 update_graph
             )
 
-        update_graph()
+        
 
             update_graph()
 
