@@ -1,11 +1,14 @@
-import psutil
+def show_cpu(self):
+    text = f"""
+CPU: {platform.processor()}
 
-def get_cpu_info():
-    freq = psutil.cpu_freq()
+Загрузка:
+{psutil.cpu_percent()} %
 
-    return {
-        "usage": psutil.cpu_percent(),
-        "cores": psutil.cpu_count(logical=False),
-        "threads": psutil.cpu_count(),
-        "frequency": round(freq.current)
-    }
+Ядер:
+{psutil.cpu_count(logical=False)}
+
+Потоков:
+{psutil.cpu_count()}
+"""
+    self.set_content(text)
