@@ -1,12 +1,17 @@
-import psutil
+def show_ram(self):
+    ram = psutil.virtual_memory()
 
-def get_memory_info():
+    text = f"""
+Всего:
+{ram.total / 1024**3:.1f} GB
 
-    mem = psutil.virtual_memory()
+Используется:
+{ram.used / 1024**3:.1f} GB
 
-    return {
-        "total": round(mem.total / 1024**3, 2),
-        "used": round(mem.used / 1024**3, 2),
-        "free": round(mem.available / 1024**3, 2),
-        "percent": mem.percent
-    }
+Свободно:
+{ram.available / 1024**3:.1f} GB
+
+Загрузка:
+{ram.percent} %
+"""
+    self.set_content(text)
