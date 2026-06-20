@@ -230,110 +230,108 @@ class SystemMonitor:
             pady=10
         )
 
-    def set_content(self, text):
+     ```
+def set_content(self, text):
 
-        self.content.delete("1.0", "end")
-        self.content.insert("1.0", text)
-       
+    self.content.delete("1.0", "end")
+    self.content.insert("1.0", text)
 
-   
-        def update_stats(self):
+def update_stats(self):
 
-        cpu = psutil.cpu_percent()
+    cpu = psutil.cpu_percent()
+    ram = psutil.virtual_memory().percent
 
-        ram = psutil.virtual_memory().percent
+    try:
+        disk = psutil.disk_usage("C:\\").percent
+    except:
+        disk = 0
 
-        try:
-            disk = psutil.disk_usage("C:\\").percent
-        except:
-            disk = 0
+    self.cpu_label.configure(
+        text=f"{cpu:.1f}%"
+    )
 
-        self.cpu_label.configure(
-            text=f"{cpu:.1f}%"
+    self.ram_label.configure(
+        text=f"{ram:.1f}%"
+    )
+
+    self.disk_label.configure(
+        text=f"{disk:.1f}%"
+    )
+
+    self.cpu_history.append(cpu)
+    self.ram_history.append(ram)
+
+    self.root.after(
+        1000,
+        self.update_stats
+    )
+
+def create_graph_window(self):
+
+    graph_window = ctk.CTkToplevel(
+        self.root
+    )
+
+    graph_window.title(
+        "CPU / RAM Graph"
+    )
+
+    graph_window.geometry(
+        "1000x500"
+    )
+
+    figure = Figure(
+        figsize=(10, 5),
+        dpi=100
+    )
+
+    ax = figure.add_subplot(111)
+
+    canvas = FigureCanvasTkAgg(
+        figure,
+        master=graph_window
+    )
+
+    canvas.get_tk_widget().pack(
+        fill="both",
+        expand=True
+    )
+
+    def update_graph():
+
+        ax.clear()
+
+        ax.plot(
+            list(self.cpu_history),
+            label="CPU %"
         )
 
-        self.ram_label.configure(
-            text=f"{ram:.1f}%"
+        ax.plot(
+            list(self.ram_history),
+            label="RAM %"
         )
 
-        self.disk_label.configure(
-            text=f"{disk:.1f}%"
+        ax.set_ylim(
+            0,
+            100
         )
 
-        self.cpu_history.append(cpu)
-        self.ram_history.append(ram)
+        ax.set_title(
+            "Real Time Monitoring"
+        )
 
-        self.root.after(
+        ax.legend()
+
+        canvas.draw()
+
+        graph_window.after(
             1000,
-            self.update_stats
+            update_graph
         )
 
-       def create_graph_window(self):
+    update_graph()
+```
 
-        graph_window = ctk.CTkToplevel(
-            self.root
-        )
-
-        graph_window.title(
-            "CPU / RAM Graph"
-        )
-
-        graph_window.geometry(
-            "1000x500"
-        )
-
-        figure = Figure(
-            figsize=(10, 5),
-            dpi=100
-        )
-
-        ax = figure.add_subplot(111)
-
-        canvas = FigureCanvasTkAgg(
-            figure,
-            master=graph_window
-        )
-
-        canvas.get_tk_widget().pack(
-            fill="both",
-            expand=True
-        )
-
-        def update_graph():
-
-            ax.clear()
-
-            ax.plot(
-                list(self.cpu_history),
-                label="CPU %"
-            )
-
-            ax.plot(
-                list(self.ram_history),
-                label="RAM %"
-            )
-
-            ax.set_ylim(
-                0,
-                100
-            )
-
-            ax.set_title(
-                "Real Time Monitoring"
-            )
-
-            ax.legend()
-
-            canvas.draw()
-
-            graph_window.after(
-                1000,
-                update_graph
-            )
-
-        
-
-            update_graph()
 
 
 if __name__ == "__main__":
