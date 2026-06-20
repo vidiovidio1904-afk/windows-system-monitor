@@ -8,34 +8,33 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 
 ctk.set_appearance_mode("dark")
-ctk.set_default_color_theme("blue")
+ctk.set_default_color_theme("blue")                        
 
 class SystemMonitor:
 
-```
-def __init__(self):
+    def __init__(self):
 
-    self.root = ctk.CTk()
-    self.root.title("Windows System Monitor Pro")
-    self.root.geometry("1600x900")
+        self.root = ctk.CTk()
+        self.root.title("Windows System Monitor Pro")
+        self.root.geometry("1600x900")
 
-    self.cpu_history = deque(maxlen=60)
-    self.ram_history = deque(maxlen=60)
+        self.cpu_history = deque(maxlen=60)
+        self.ram_history = deque(maxlen=60)
 
-    for _ in range(60):
-        self.cpu_history.append(0)
-        self.ram_history.append(0)
+        for _ in range(60):
+            self.cpu_history.append(0)
+            self.ram_history.append(0)
 
-    self.build_ui()
+        self.build_ui()
 
-    self.root.after(1000, self.update_stats)
+        self.root.after(1000, self.update_stats)
 
-    self.show_summary()
+        self.show_summary()
 
-    self.root.mainloop()
+        self.root.mainloop()
 
-def build_ui(self):
-
+    def build_ui(self):
+        
     self.sidebar = ctk.CTkFrame(
         self.root,
         width=250,
