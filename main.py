@@ -234,7 +234,7 @@ class SystemMonitor:
 
         self.content.delete("1.0", "end")
         self.content.insert("1.0", text)
-        def set_content(self, text):
+       
 
    
         def update_stats(self):
