@@ -268,7 +268,7 @@ class SystemMonitor:
             self.update_stats
         )
 
-    def create_graph_window(self):
+       def create_graph_window(self):
 
         graph_window = ctk.CTkToplevel(
             self.root
